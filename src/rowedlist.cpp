@@ -1,5 +1,5 @@
 #include <QtGui>
-#include "rowedlist.h"
+#include "rowedlist.hpp"
 
 RowedList::RowedList(QWidget *parent)
 	: QWidget(parent),curFont(QFont()),  showMissing(true)

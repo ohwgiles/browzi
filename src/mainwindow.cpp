@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "searchradical.hpp"
-#include "rowedlist.h"
+#include "rowedlist.hpp"
 
 #include "characterdisplaypanel.hpp"
 

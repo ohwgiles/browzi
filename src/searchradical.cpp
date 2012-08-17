@@ -1,5 +1,5 @@
 #include "searchradical.hpp"
-#include "rowedlist.h"
+#include "rowedlist.hpp"
 
 extern "C" {
 #include <libUnihan/Unihan.h>

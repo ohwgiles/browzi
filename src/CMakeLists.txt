@@ -6,7 +6,7 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
 set(SOURCES main.cpp mainwindow.cpp rowedlist.cpp searchradical.cpp characterdisplaypanel.cpp)
-set(HEADERS mainwindow.hpp rowedlist.h searchradical.hpp characterdisplaypanel.hpp)
+set(HEADERS mainwindow.hpp rowedlist.hpp searchradical.hpp characterdisplaypanel.hpp)
 set(FORMS mainwindow.ui)
 
 qt4_wrap_ui(FORMS_HEADERS ${FORMS})
