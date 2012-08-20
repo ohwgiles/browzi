@@ -1,48 +1,63 @@
 #include "searchradical.hpp"
 #include "rowedlist.hpp"
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QLabel>
+#include "unihan.hpp"
 
-extern "C" {
-#include <libUnihan/Unihan.h>
-}
+SearchRadical::SearchRadical(QWidget *parent) : SearchPanel(parent) {
+	QVBoxLayout* vtLayout = new QVBoxLayout(this);
+	QLabel* radicalLabel = new QLabel(this);
+	radicalLabel->setText("Radical:");
+	vtLayout->addWidget(radicalLabel);
 
-#include <iostream>
+	QScrollArea* radicalScrollArea = new QScrollArea(this);
+	QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(radicalScrollArea->sizePolicy().hasHeightForWidth());
+	radicalScrollArea->setSizePolicy(sizePolicy);
+	radicalScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	radicalScrollArea->setWidgetResizable(true);
+	vtLayout->addWidget(radicalScrollArea);
 
-SearchRadical::SearchRadical(RowedList& rads,RowedList& cand, QObject* parent) :
-	QObject(parent), rads(rads), cand(cand)
-{unihanDb_open_default();/*
-	std::cout << "here" << std::endl;
-	unihanDb_open_default(); //todo errors
-	UnihanField* r = unihanTable_get_fields(UNIHAN_TABLE_KRSUNICODE);
-	for(int i=0; r[i] != UNIHAN_INVALID_FIELD; ++i) {
-		std::cout << *r << std::endl;
-		std::cout << unihanField_to_string(r[i]) << std::endl;
-	}
-	g_free(r);*/
-setlocale(LC_CTYPE, "zh_CN.UTF-8");
-	char rad[1024] = "|";
-	char *rp = &rad[1];
-	wchar_t wcs_radical[] = L"";
+	QLabel* disambiguateLabel = new QLabel(this);
+	disambiguateLabel->setText("Disambiguate:");
+	vtLayout->addWidget(disambiguateLabel);
+
+	QScrollArea* candidatesScrollArea = new QScrollArea(this);
+	sizePolicy.setHeightForWidth(candidatesScrollArea->sizePolicy().hasHeightForWidth());
+	candidatesScrollArea->setSizePolicy(sizePolicy);
+	candidatesScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	candidatesScrollArea->setWidgetResizable(true);
+	vtLayout->addWidget(candidatesScrollArea);
+
+	listRadicals  = new RowedList(radicalScrollArea);
+	radicalScrollArea->setWidget(listRadicals);
+	radicalScrollArea->setWidgetResizable(true);
+	listCandidates = new RowedList(candidatesScrollArea);
+	candidatesScrollArea->setWidget(listCandidates);
+	candidatesScrollArea->setWidgetResizable(true);
+
+	QString rad = "|";
 	for(int i=0; i < 214; ++i) {
-	wcs_radical[0] = 0x2f00 + i;//sqlite3_column_int(stmt_radicals, 1);
-	rp += wcstombs(rp, wcs_radical, 4);
-	}/*
-	for(int i=0; i < 116; ++i) {
-	wcs_radical[0] = 0x2e80 + i;//sqlite3_column_int(stmt_radicals, 1);
-	rp += wcstombs(rp, wcs_radical, 4);
-	}*/
-	std::cout << rad << std::endl;
+		uint radical = 0x2f00 + i;
+		rad += QString::fromUcs4(&radical, 1);
+	}
+
 	QStringList p;
-	p << QString::fromUtf8(rad, rp-rad);
-	rads.setItems(p);
-	connect(&rads, SIGNAL(characterSelected(QString)), this, SLOT(radicalChosen(QString)));
-	connect(&cand, SIGNAL(characterSelected(QString)), this, SLOT(disambiguated(QString)));
+	p << rad;
+	listRadicals->setItems(p);
+
+	connect(listRadicals, SIGNAL(characterSelected(QString)), this, SLOT(radicalChosen(QString)));
+	connect(listCandidates, SIGNAL(characterSelected(QString)), this, SLOT(disambiguated(QString)));
 }
 
 void SearchRadical::radicalChosen(QString s) {
 	// get radical number from string
 	uint radicalNumber = s.toUcs4()[0] - 0x2f00 + 1;
-	cand.clear();
-	std::cout << "fetching data for radical: " << radicalNumber << std::endl;
+	listCandidates->clear();
+
 	// First, get the number of possible additional strokes
 	QList<uint> extraStrokes;
 	{
@@ -56,7 +71,7 @@ void SearchRadical::radicalChosen(QString s) {
 	}
 
 	// Now for each possible number of extra strokes, assemble the list of candidates
-	//QStringList candidates;
+	QStringList candidates;
 	candidates.clear();
 	{
 		foreach(uint s, extraStrokes) {
@@ -70,15 +85,13 @@ void SearchRadical::radicalChosen(QString s) {
 			candidates << chars;
 		}
 	}
-	std::cout << "Setting candidates" << std::endl;
-	cand.setItems(candidates);
+	listCandidates->setItems(candidates);
 }
 
 void SearchRadical::disambiguated(QString s) {
 	// get char number from string
-	emit showCharacter(s.toUcs4()[0]);
+	charChosen(s.toUcs4()[0]);
 }
 
 SearchRadical::~SearchRadical() {
-	unihanDb_close();
 }

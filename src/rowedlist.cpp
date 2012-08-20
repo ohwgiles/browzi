@@ -2,7 +2,7 @@
 #include "rowedlist.hpp"
 
 RowedList::RowedList(QWidget *parent)
-	: QWidget(parent),curFont(QFont()),  showMissing(true)
+	: QWidget(parent),curFont(QFont()),  showMissing(false)
 {
 	curHeaderFont=parent->font();
 	pen1.setBrush(Qt::gray);

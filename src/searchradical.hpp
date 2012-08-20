@@ -1,24 +1,23 @@
 #ifndef SEARCHRADICAL_HPP
 #define SEARCHRADICAL_HPP
 
-#include <QObject>
-#include <QStringList>
-class RowedList;
+#include "searchpanel.hpp"
 
-class SearchRadical : public QObject {
+class RowedList;
+class QScrollArea;
+
+class SearchRadical : public SearchPanel {
 	Q_OBJECT
 public:
-	SearchRadical(RowedList& rads, RowedList& cand, QObject *parent = 0);
+	SearchRadical(QWidget* parent);
 	virtual ~SearchRadical();
 private:
-	RowedList& rads;
-	RowedList& cand;
-QStringList candidates;
+	RowedList* listRadicals;
+	RowedList* listCandidates;
+
 private slots:
 	void radicalChosen(QString);
 	void disambiguated(QString);
-signals:
-	void showCharacter(uint);
 };
 
 #endif // SEARCHRADICAL_HPP

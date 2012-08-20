@@ -1,24 +1,30 @@
 #ifndef CHARACTERDISPLAYPANEL_HPP
 #define CHARACTERDISPLAYPANEL_HPP
 
-#include <QObject>
+#include <QWidget>
 
-namespace Ui {
-class MainWindow;
-}
+class QLineEdit;
 
-class CharacterDisplayPanel : public QObject
-{
+class CharacterDisplayPanel : public QWidget {
 	Q_OBJECT
 public:
-	CharacterDisplayPanel(Ui::MainWindow& ui);
+	CharacterDisplayPanel();
 
 public slots:
 	void setCharacter(uint);
 	void clear();
 
 private:
-	Ui::MainWindow& ui;
+	QLineEdit* rs_hz;
+	QLineEdit* rs_rad;
+	QLineEdit* rs_es;
+	QLineEdit* rs_ts;
+	QLineEdit* rs_def;
+	QLineEdit* rs_py;
+	QLineEdit* rs_cj;
+	QLineEdit* rs_hsk;
+	QLineEdit* rs_fq;
+
 };
 
 #endif // CHARACTERDISPLAYPANEL_HPP

@@ -4,6 +4,8 @@
 #include <QMainWindow>
 
 class RowedList;
+class SearchPanel;
+class CharacterDisplayPanel;
 
 namespace Ui {
 class MainWindow;
@@ -16,12 +18,13 @@ class MainWindow : public QMainWindow
 public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
-	void setRads();
 	
 private:
-	Ui::MainWindow *ui;
-	RowedList* rad_select;
-	RowedList* rad_candidate;
+	QTabWidget* tabWidget;
+	CharacterDisplayPanel* displayPanel;
+
+private slots:
+	void tabChanged(int);
 };
 
 #endif // MAINWINDOW_HPP
