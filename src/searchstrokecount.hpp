@@ -18,7 +18,7 @@ private:
 	RowedList* candidates;
 private slots:
 	void strokesChanged(int);
-	void disambiguate(QString);
+	//void disambiguate(QString);
 };
 
 #endif // SEARCHSTROKECOUNT_HPP

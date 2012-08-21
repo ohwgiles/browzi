@@ -36,7 +36,7 @@ SearchStrokeCount::SearchStrokeCount(QWidget *parent) : SearchPanel(parent) {
 	candidatesScrollArea->setWidgetResizable(true);
 
 	connect(numStrokes, SIGNAL(valueChanged(int)), this, SLOT(strokesChanged(int)));
-	connect(candidates, SIGNAL(characterSelected(QString)), this, SLOT(disambiguate(QString)));
+	connect(candidates, SIGNAL(characterSelected(QString)), this, SLOT(disambiguated(QString)));
 
 	numStrokes->setValue(1);
 	strokesChanged(1);
@@ -54,7 +54,7 @@ void SearchStrokeCount::strokesChanged(int s) {
 	l << result;
 	candidates->setItems(l);
 }
-
+/*
 void SearchStrokeCount::disambiguate(QString s) {
 	charChosen(s.toUcs4()[0]);
-}
+}*/

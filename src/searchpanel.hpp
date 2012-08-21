@@ -9,13 +9,15 @@ class SearchPanel : public QWidget {
 public:
 	SearchPanel(QWidget *parent = 0);
 
-	void charChosen(uint);
+	//void charChosen(uint);
 	uint lastChar() const { return lastCharacter; }
 private:
 	uint lastCharacter;
 
 signals:
 	void showCharacter(uint);
+protected slots:
+	void disambiguated(QString);
 };
 
 #endif // SEARCHPANEL_HPP

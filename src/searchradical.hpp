@@ -17,7 +17,7 @@ private:
 
 private slots:
 	void radicalChosen(QString);
-	void disambiguated(QString);
+	//void disambiguated(QString);
 };
 
 #endif // SEARCHRADICAL_HPP

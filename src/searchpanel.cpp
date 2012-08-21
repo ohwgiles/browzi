@@ -8,7 +8,8 @@ SearchPanel::SearchPanel(QWidget *parent) :
 {
 }
 
-void SearchPanel::charChosen(uint c) {
-	lastCharacter = c;
-	emit showCharacter(c);
+void SearchPanel::disambiguated(QString s) {
+	lastCharacter = s.toUcs4()[0];
+	emit showCharacter(lastCharacter);
 }
+

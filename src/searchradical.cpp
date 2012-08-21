@@ -87,11 +87,11 @@ void SearchRadical::radicalChosen(QString s) {
 	}
 	listCandidates->setItems(candidates);
 }
-
+/*
 void SearchRadical::disambiguated(QString s) {
 	// get char number from string
 	charChosen(s.toUcs4()[0]);
-}
+}*/
 
 SearchRadical::~SearchRadical() {
 }
