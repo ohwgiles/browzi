@@ -1,3 +1,11 @@
+/// writtenstroke.cpp
+/// This file is part of Plain Hanzi Editor (PHE):
+/// http://qt-apps.org/content/show.php/PHE+-+Plain+Hanzi+Editor?content=100586
+/// It is used in Browzi under the terms of the GPL, under which PHE is released.
+/// Plain Hanzi Editor appears to be Copyright 2009 Alex Novichkov.
+/// Specific copyright and licensing details were unforthcoming at the
+/// time of this file's inclusion in Browzi.
+/// Modifications to this file from its original are Copyright 2012 Oliver Giles
 #include "writtenpoint.h"
 #include "writtenstroke.h"
 #include "math.h"
@@ -42,23 +50,23 @@ int WrittenStroke::getType()
 		}
 	}
 
-	//определяем тип черты
+	//РѕРїСЂРµРґРµР»СЏРµРј С‚РёРї С‡РµСЂС‚С‹
 	int num=directions.count();
 	if (num!=lengths.count()) return 0;
-	//первая - горизонтальная
+	//РїРµСЂРІР°СЏ - РіРѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅР°СЏ
 	if (directions.at(0)>350 || directions.at(0)<30) {
 	    if (num>=2) return 6;
 	    else return 1;
-	//первая - откидная влево
+	//РїРµСЂРІР°СЏ - РѕС‚РєРёРґРЅР°СЏ РІР»РµРІРѕ
     } else if (directions.at(0)>180 && directions.at(0)<=260) {
 	    if (num>=2 && lengths.at(1)>6) return 9;
 	    else return 4;
-	//первая - откидная вправо
+	//РїРµСЂРІР°СЏ - РѕС‚РєРёРґРЅР°СЏ РІРїСЂР°РІРѕ
     } else if (directions.at(0)>=280 && directions.at(0)<=350) {
 	    if (num>=2 && directions.at(1)>=30 && directions.at(1)<100
 	        && lengths.at(0)<lengths.at(1)) return 5;
 	    else return 3;
-	//первая - вертикальная
+	//РїРµСЂРІР°СЏ - РІРµСЂС‚РёРєР°Р»СЊРЅР°СЏ
     } else if (directions.at(0)>260 && directions.at(0)<280) {
 	    if (num>=2 && lengths.at(1)>6) return 8;
 	    else return 2;

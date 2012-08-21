@@ -9,7 +9,7 @@ set(SOURCES main.cpp mainwindow.cpp rowedlist.cpp searchpanel.cpp
 	searchdraw.cpp searchpinyin.cpp searchenglish.cpp searchradical.cpp
 	searchstrokecount.cpp characterdisplaypanel.cpp scribblearea.cpp strokesmatcher.cpp writtencharacter.cpp writtenstroke.cpp writtenpoint.cpp)
 
-set(HEADERS mainwindow.hpp rowedlist.hpp searchpanel.hpp searchdraw.hpp
+set(HEADERS mainwindow.hpp rowedlist.h searchpanel.hpp searchdraw.hpp
 	searchpinyin.hpp searchenglish.hpp searchradical.hpp searchstrokecount.hpp
 	characterdisplaypanel.hpp scribblearea.h)
 
