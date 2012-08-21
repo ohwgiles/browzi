@@ -24,7 +24,7 @@ void StrokesMatcher::setOnlyExact(bool b)
 
 void StrokesMatcher::initStrokesData()
 {
-	 QFile f("strokes.txt");
+	 QFile f(":strokes.txt");
     if (f.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream in(&f);
         in.setCodec("UTF-8");
