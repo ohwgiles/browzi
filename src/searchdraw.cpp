@@ -21,14 +21,13 @@
  **************************************************************************/
 #include "searchdraw.hpp"
 #include "rowedlist.h"
+#include "scribblearea.h"
+#include "strokesmatcher.h"
+#include "characterdescriptor.h"
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QListWidget>
 #include <QScrollArea>
-#include "scribblearea.h"
-
-#include "strokesmatcher.h"
-#include "characterdescriptor.h"
 
 SearchDraw::SearchDraw() {
 	QVBoxLayout* vtLayout = new QVBoxLayout(this);
@@ -95,5 +94,4 @@ void SearchDraw::searchHandwritten() {
 	items << matches;
 	candidates->clear();
 	candidates->setItems(items);
-
 }

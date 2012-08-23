@@ -22,11 +22,12 @@
  *
  **************************************************************************/
 #include "searchpanel.hpp"
+#include "dbaccessor.hpp"
 
 class ScribbleArea;
 class RowedList;
 
-class SearchDraw : public SearchPanel {
+class SearchDraw : public SearchPanel, public DBAccessor {
 	Q_OBJECT
 public:
 	SearchDraw();

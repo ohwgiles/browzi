@@ -22,10 +22,12 @@
  *
  **************************************************************************/
 #include "searchpanel.hpp"
+#include "dbaccessor.hpp"
+
 class QTreeWidget;
 class QTreeWidgetItem;
-class SearchEnglish : public SearchPanel
-{
+
+class SearchEnglish : public SearchPanel, public DBAccessor {
 	Q_OBJECT
 public:
 	SearchEnglish();
@@ -36,6 +38,7 @@ private slots:
 
 private:
 	QTreeWidget* candidates;
+	sqlite3_stmt* stmt;
 };
 
 #endif // SEARCHENGLISH_HPP

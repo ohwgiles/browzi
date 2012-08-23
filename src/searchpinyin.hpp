@@ -22,16 +22,17 @@
  *
  **************************************************************************/
 #include "searchpanel.hpp"
+#include "dbaccessor.hpp"
 
 class RowedList;
 
-class SearchPinyin : public SearchPanel
-{
+class SearchPinyin : public SearchPanel, public DBAccessor {
 	Q_OBJECT
 public:
 	SearchPinyin();
 private:
 	RowedList* candidates;
+	sqlite3_stmt* stmt;
 private slots:
 	void searchTermChanged(QString s);
 };

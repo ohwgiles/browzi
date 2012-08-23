@@ -26,7 +26,7 @@
 #include <QScrollArea>
 #include <QLineEdit>
 #include <QLabel>
-#include "unihan.hpp"
+#include <sqlite3.h>
 
 SearchPinyin::SearchPinyin()
 {
@@ -59,8 +59,14 @@ SearchPinyin::SearchPinyin()
 
 	vtLayout->addWidget(candidatesScrollArea);
 
+	stmt = createStatement(
+		"select utf8 from utf8Table join \
+		kMandarinTable on kMandarinTable.code = utf8Table.code \
+		where kMandarinTable.kMandarin = ?;");
+
 	connect(pinyin, SIGNAL(textEdited(QString)), this, SLOT(searchTermChanged(QString)));
 	connect(candidates, SIGNAL(characterSelected(QString)), this, SLOT(disambiguated(QString)));
+
 }
 
 void SearchPinyin::searchTermChanged(QString s) {
@@ -75,20 +81,16 @@ void SearchPinyin::searchTermChanged(QString s) {
 		first = '1';
 		last = '5';
 	}
-
 	QStringList cnd;
 	do {
-		QString query = "select utf8 from utf8Table join \
-				kMandarinTable on kMandarinTable.code = utf8Table.code \
-				where kMandarinTable.kMandarin = \"" + s.toUpper() + first + "\"";
-		SQL_Result* res = unihanSql_get_sql_result(query.toAscii().constData());
+		QString pinyin = s.toUpper().toUtf8() + first;
+		sqlite3_bind_text(stmt, 1, pinyin.toUtf8().constData(), -1, SQLITE_TRANSIENT);
 		QString hanzi = s + first + "|";
-		for(int i = 0; i < res->resultList->len; ++i) {
-			hanzi.append(QString::fromUtf8(stringList_index(res->resultList, i)));
+		while(sqlite3_step(stmt) == SQLITE_ROW) {
+			hanzi.append(QString::fromUtf8((const char*)sqlite3_column_text(stmt,0)));
 		}
-		sql_result_free(res, true);
+		sqlite3_reset(stmt);
 		cnd << hanzi;
 	} while(first++ != last);
-
 	candidates->setItems(cnd);
 }

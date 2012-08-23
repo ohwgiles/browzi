@@ -25,7 +25,7 @@
 #include <QLabel>
 #include <QTreeWidget>
 #include <QHeaderView>
-#include "unihan.hpp"
+#include <sqlite3.h>
 
 SearchEnglish::SearchEnglish() {
 	QVBoxLayout* vtLayout = new QVBoxLayout(this);
@@ -51,34 +51,36 @@ SearchEnglish::SearchEnglish() {
 
 	connect(englishWord, SIGNAL(textEdited(QString)), this, SLOT(searchTermModified(QString)));
 	connect(candidates, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(entrySelected(QTreeWidgetItem*,QTreeWidgetItem*)));
+
+	stmt = createStatement(
+				"select kMandarinTable.kMandarin,\
+				utf8Table.utf8,\
+				kDefinition\
+			from kDefinitionTable \
+			join kMandarinTable on kMandarinTable.code = kDefinitionTable.code \
+			join utf8Table on utf8Table.code = kDefinitionTable.code \
+			where kDefinition like ?\
+			order by kMandarinTable.kMandarin;");
 }
 
 void SearchEnglish::searchTermModified(QString s) {
 	candidates->clear();
 	if(s.length() < 3) return;
 
-	QString query = "select kMandarinTable.kMandarin,\
-			utf8Table.utf8,\
-			kDefinition\
-			from kDefinitionTable \
-			join kMandarinTable on kMandarinTable.code = kDefinitionTable.code \
-			join utf8Table on utf8Table.code = kDefinitionTable.code \
-			where kDefinition like \"%" + s.toLower() + "%\"\
-			order by kMandarinTable.kMandarin";
-	SQL_Result* res = unihanSql_get_sql_result(query.toAscii().constData());
 
+	sqlite3_bind_text(stmt, 1, QString("%"+s+"%").toUtf8().constData(), -1, SQLITE_TRANSIENT);
 	QList<QTreeWidgetItem *> items;
-	for(int i = 0; i < res->resultList->len; i+=3) {
+	while(sqlite3_step(stmt) == SQLITE_ROW) {
 		QStringList cols;
-		cols << QString::fromUtf8(stringList_index(res->resultList, i))
-			  << QString::fromUtf8(stringList_index(res->resultList, i + 1))
-			  << QString::fromUtf8(stringList_index(res->resultList, i + 2));
+		cols << QString::fromUtf8((const char*)sqlite3_column_text(stmt, 0))
+			  << QString::fromUtf8((const char*)sqlite3_column_text(stmt, 1))
+			  << QString::fromUtf8((const char*)sqlite3_column_text(stmt, 2));
 		items.append(new QTreeWidgetItem((QTreeWidget*)0, cols));
 	}
+	sqlite3_reset(stmt);
 	candidates->insertTopLevelItems(1, items);
 	candidates->resizeColumnToContents(0);
 	candidates->resizeColumnToContents(1);
-	sql_result_free(res, true);
 }
 
 void SearchEnglish::entrySelected(QTreeWidgetItem* newItem,QTreeWidgetItem*) {

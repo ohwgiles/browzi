@@ -22,20 +22,20 @@
  *
  **************************************************************************/
 #include "searchpanel.hpp"
+#include "dbaccessor.hpp"
 
 class RowedList;
-
 class QSpinBox;
 class QScrollArea;
 
-class SearchStrokeCount : public SearchPanel
-{
+class SearchStrokeCount : public SearchPanel, public DBAccessor {
 	Q_OBJECT
 public:
 	SearchStrokeCount(QWidget *parent = 0);
 
 private:
 	RowedList* candidates;
+	sqlite3_stmt* stmt;
 private slots:
 	void strokesChanged(int);
 	//void disambiguate(QString);

@@ -24,7 +24,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "unihan.hpp"
+#include <sqlite3.h>
 
 SearchRadical::SearchRadical(QWidget *parent) : SearchPanel(parent) {
 	QVBoxLayout* vtLayout = new QVBoxLayout(this);
@@ -72,6 +72,16 @@ SearchRadical::SearchRadical(QWidget *parent) : SearchPanel(parent) {
 
 	connect(listRadicals, SIGNAL(characterSelected(QString)), this, SLOT(radicalChosen(QString)));
 	connect(listCandidates, SIGNAL(characterSelected(QString)), this, SLOT(disambiguated(QString)));
+
+	stmtExtraStrokes = createStatement(
+				"select additionalStrokeCount from\
+				kRSUnicodeTable where radicalIndex = ?\
+				group by additionalStrokeCount;");
+	stmtCandidates = createStatement(
+				"select utf8 from utf8Table\
+				inner join kRSUnicodeTable on kRSUnicodeTable.code=utf8Table.code\
+				where kRSUnicodeTable.radicalIndex = ? and\
+				krsUnicodeTable.additionalStrokeCount = ?;");
 }
 
 void SearchRadical::radicalChosen(QString s) {
@@ -82,12 +92,11 @@ void SearchRadical::radicalChosen(QString s) {
 	// First, get the number of possible additional strokes
 	QList<uint> extraStrokes;
 	{
-		QString query = "select additionalStrokeCount from kRSUnicodeTable where radicalIndex = " + QString::number(radicalNumber) + " group by additionalStrokeCount";
-		SQL_Result* res = unihanSql_get_sql_result(query.toAscii().constData());
-		for(int i = 0; i < res->resultList->len; ++i) {
-			extraStrokes.append(QString(stringList_index(res->resultList, i)).toInt());
+		sqlite3_bind_int(stmtExtraStrokes, 1, radicalNumber);
+		while(sqlite3_step(stmtExtraStrokes) == SQLITE_ROW) {
+			extraStrokes.append(sqlite3_column_int(stmtExtraStrokes,0));
 		}
-		sql_result_free(res, true);
+		sqlite3_reset(stmtExtraStrokes);
 		qSort(extraStrokes);
 	}
 
@@ -96,13 +105,14 @@ void SearchRadical::radicalChosen(QString s) {
 	candidates.clear();
 	{
 		foreach(uint s, extraStrokes) {
-			QString query = "select utf8 from utf8Table inner join kRSUnicodeTable on kRSUnicodeTable.code=utf8Table.code where kRSUnicodeTable.radicalIndex = " + QString::number(radicalNumber) + " and krsUnicodeTable.additionalStrokeCount = " + QString::number(s);
-			SQL_Result* res = unihanSql_get_sql_result(query.toAscii().constData());
+			sqlite3_bind_int(stmtCandidates, 1, radicalNumber);
+			sqlite3_bind_int(stmtCandidates, 2, s);
+
 			QString chars = QString::number(s) + "|";
-			for(int i = 0; i < res->resultList->len; ++i) {
-				chars.append(QString::fromUtf8(stringList_index(res->resultList, i)));
+			while(sqlite3_step(stmtCandidates) == SQLITE_ROW) {
+				chars.append(QString::fromUtf8((const char*)sqlite3_column_text(stmtCandidates,0)));
 			}
-			sql_result_free(res, true);
+			sqlite3_reset(stmtCandidates);
 			candidates << chars;
 		}
 	}

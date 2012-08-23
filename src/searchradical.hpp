@@ -22,18 +22,21 @@
  *
  **************************************************************************/
 #include "searchpanel.hpp"
+#include "dbaccessor.hpp"
 
 class RowedList;
 class QScrollArea;
 
-class SearchRadical : public SearchPanel {
+class SearchRadical : public SearchPanel, public DBAccessor {
 	Q_OBJECT
 public:
 	SearchRadical(QWidget* parent);
 	virtual ~SearchRadical();
 private:
 	RowedList* listRadicals;
+	sqlite3_stmt* stmtExtraStrokes;
 	RowedList* listCandidates;
+	sqlite3_stmt* stmtCandidates;
 
 private slots:
 	void radicalChosen(QString);

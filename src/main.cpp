@@ -20,17 +20,27 @@
  *
  **************************************************************************/
 #include <QApplication>
+#include "dbaccessor.hpp"
 #include "mainwindow.hpp"
-#include "unihan.hpp"
 
+#ifdef _WIN32
+#define _UNICODE
+#include <windows.h>
+char* WIN_UNIHAN_DB_PATH() {
+
+}
+#endif
 
 int main(int argc, char** argv) {
-	unihanDb_open_default();
-
+#ifdef _WIN32
+	uinhanDb_open(WIN_UNIHAN_DB_PATH(), O_READONLY);
+#else
+	DBAccessor::open("/usr/share/UnihanDb/Unihan.db");
+#endif
 	QApplication app(argc, argv);
 	MainWindow m;
 	m.show();
 	app.exec();
 
-	unihanDb_close();
+	DBAccessor::close();
 }

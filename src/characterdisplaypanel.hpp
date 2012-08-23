@@ -22,10 +22,12 @@
  *
  **************************************************************************/
 #include <QWidget>
+#include "dbaccessor.hpp"
 
 class QLineEdit;
+class QPlainTextEdit;
 
-class CharacterDisplayPanel : public QWidget {
+class CharacterDisplayPanel : public QWidget, public DBAccessor {
 	Q_OBJECT
 public:
 	CharacterDisplayPanel();
@@ -39,12 +41,14 @@ private:
 	QLineEdit* rs_rad;
 	QLineEdit* rs_es;
 	QLineEdit* rs_ts;
-	QLineEdit* rs_def;
+	QPlainTextEdit* rs_def;
 	QLineEdit* rs_py;
 	QLineEdit* rs_cj;
 	QLineEdit* rs_hsk;
 	QLineEdit* rs_fq;
 
+	sqlite3_stmt* stmt;
+	sqlite3_stmt* pinyinStmt;
 };
 
 #endif // CHARACTERDISPLAYPANEL_HPP

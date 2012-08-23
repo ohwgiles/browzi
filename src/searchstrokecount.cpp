@@ -20,13 +20,12 @@
  *
  **************************************************************************/
 #include "searchstrokecount.hpp"
-#include <QSpinBox>
 #include "rowedlist.h"
+#include <QSpinBox>
 #include <QScrollArea>
-
-#include "unihan.hpp"
 #include <QLabel>
 #include <QVBoxLayout>
+#include <sqlite3.h>
 
 SearchStrokeCount::SearchStrokeCount(QWidget *parent) : SearchPanel(parent) {
 	QVBoxLayout* vtLayout = new QVBoxLayout(this);
@@ -59,18 +58,22 @@ SearchStrokeCount::SearchStrokeCount(QWidget *parent) : SearchPanel(parent) {
 	connect(numStrokes, SIGNAL(valueChanged(int)), this, SLOT(strokesChanged(int)));
 	connect(candidates, SIGNAL(characterSelected(QString)), this, SLOT(disambiguated(QString)));
 
+	stmt = createStatement(
+		"select utf8 from utf8Table\
+		join kTotalStrokesTable on kTotalStrokesTable.code == utf8Table.code\
+		where kTotalStrokesTable.kTotalStrokes = ?;");
+
 	numStrokes->setValue(1);
 	strokesChanged(1);
 }
 
 void SearchStrokeCount::strokesChanged(int s) {
 	QString result = "|";
-	QString query = "select utf8 from utf8Table join kTotalStrokesTable on kTotalStrokesTable.code == utf8Table.code where kTotalStrokesTable.kTotalStrokes = " + QString::number(s);
-	SQL_Result* res = unihanSql_get_sql_result(query.toAscii().constData());
-	for(int i = 0; i < res->resultList->len; ++i) {
-		result.append(QString::fromUtf8(stringList_index(res->resultList, i)));
+	sqlite3_bind_int(stmt, 1, s);
+	while(sqlite3_step(stmt) == SQLITE_ROW) {
+		result.append(QString::fromUtf8((const char*)sqlite3_column_text(stmt, 0)));
 	}
-	sql_result_free(res, true);
+	sqlite3_reset(stmt);
 	QStringList l;
 	l << result;
 	candidates->setItems(l);

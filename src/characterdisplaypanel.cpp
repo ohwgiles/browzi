@@ -20,10 +20,11 @@
  *
  **************************************************************************/
 #include "characterdisplaypanel.hpp"
-#include "unihan.hpp"
 #include <QGridLayout>
 #include <QLabel>
+#include <QPlainTextEdit>
 #include <QLineEdit>
+#include <sqlite3.h>
 
 CharacterDisplayPanel::CharacterDisplayPanel() {
 	QGridLayout* grid = new QGridLayout(this);
@@ -73,7 +74,7 @@ CharacterDisplayPanel::CharacterDisplayPanel() {
 	lbl_def->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 	grid->addWidget(lbl_def, 4, 0, 1, 1);
 	// Field: Definition
-	rs_def = new QLineEdit(this);
+	rs_def = new QPlainTextEdit(this);
 	rs_def->setReadOnly(true);
 	grid->addWidget(rs_def, 4, 1, 1, 1);
 	// Label: Pinyin/Mandarin
@@ -112,6 +113,30 @@ CharacterDisplayPanel::CharacterDisplayPanel() {
 	rs_fq = new QLineEdit(this);
 	rs_fq->setReadOnly(true);
 	grid->addWidget(rs_fq, 8, 1, 1, 1);
+
+	stmt = createStatement(
+				"select \
+				kRSUnicodeTable.radicalIndex,\
+				kRSUnicodeTable.additionalStrokeCount,\
+				kTotalStrokesTable.kTotalStrokes,\
+				kDefinitionTable.kDefinition,\
+				kCangjieTable.kCangjie,\
+				kGradeLevelTable.kGradeLevel,\
+				kFrequencyTable.kFrequency\
+			from utf8Table\
+			left join kRSUnicodeTable on kRSUnicodeTable.code = utf8Table.code\
+			left join kTotalStrokesTable on kTotalStrokesTable.code = utf8Table.code\
+			left join kDefinitionTable on kDefinitionTable.code = utf8Table.code\
+			left join kCangjieTable on kCangjieTable.code = utf8Table.code\
+			left join kFrequencyTable on kFrequencyTable.code = utf8Table.code\
+			left join kGradeLevelTable on kGradeLevelTable.code = utf8Table.code\
+			where utf8Table.utf8 == ?;");
+	pinyinStmt = createStatement(
+				"select \
+				kMandarin\
+			from kMandarinTable\
+			join utf8Table on kMandarinTable.code = utf8Table.code\
+			where utf8Table.utf8 == ?;");
 }
 
 void CharacterDisplayPanel::clear() {
@@ -129,43 +154,29 @@ void CharacterDisplayPanel::clear() {
 void CharacterDisplayPanel::setCharacter(uint c) {
 	clear();
 	if(c == 0) return;
+	QString hanzi = QString::fromUcs4(&c, 1);
 
-	QString hanzi =  QString::fromUcs4(&c, 1);
-
-	QString query = "select \
-			kRSUnicodeTable.radicalIndex,\
-			kRSUnicodeTable.additionalStrokeCount,\
-			kTotalStrokesTable.kTotalStrokes,\
-			kDefinitionTable.kDefinition,\
-			kMandarinTable.kMandarin,\
-			kCangjieTable.kCangjie,\
-			kGradeLevelTable.kGradeLevel,\
-			kFrequencyTable.kFrequency\
-		from utf8Table\
-		left join kRSUnicodeTable on kRSUnicodeTable.code = utf8Table.code\
-		left join kTotalStrokesTable on kTotalStrokesTable.code = utf8Table.code\
-		left join kDefinitionTable on kDefinitionTable.code = utf8Table.code\
-		left join kCangjieTable on kCangjieTable.code = utf8Table.code\
-		left join kFrequencyTable on kFrequencyTable.code = utf8Table.code\
-		left join kMandarinTable on kMandarinTable.code = utf8Table.code\
-		left join kGradeLevelTable on kGradeLevelTable.code = utf8Table.code\
-			where utf8Table.utf8 == \"" + hanzi + "\"";
-
-	SQL_Result* res = unihanSql_get_sql_result(query.toUtf8().constData());
-
-	//if(res->resultList->len == 8) {
+	sqlite3_bind_text(stmt, 1, hanzi.toUtf8().constData(), -1, SQLITE_TRANSIENT);
+	if(sqlite3_step(stmt) == SQLITE_ROW) {
 		rs_hz->setText(hanzi);
-
-		uint rad = QString(QString::fromUtf8(stringList_index(res->resultList,0))).toInt() + 0x2f00 - 1;
+		uint rad = sqlite3_column_int(stmt,0) + 0x2f00 - 1;
 		rs_rad->setText(QString::fromUcs4(&rad,1));
-		rs_es->setText(QString::fromUtf8(stringList_index(res->resultList,1)));
-		rs_ts->setText(QString::fromUtf8(stringList_index(res->resultList,2)));
-		rs_def->setText(QString::fromUtf8(stringList_index(res->resultList,3)));
-		rs_py->setText(QString::fromUtf8(stringList_index(res->resultList,4)));
-		rs_cj->setText(QString::fromUtf8(stringList_index(res->resultList,5)));
-		rs_hsk->setText(QString::fromUtf8(stringList_index(res->resultList,6)));
-		rs_fq->setText(QString::fromUtf8(stringList_index(res->resultList,7)));
-	//b}
+		rs_es->setText(QString::fromUtf8((const char*)sqlite3_column_text(stmt,1),sqlite3_column_bytes(stmt,1)));
+		rs_ts->setText(QString::fromUtf8((const char*)sqlite3_column_text(stmt,2),sqlite3_column_bytes(stmt,2)));
+		rs_def->document()->setPlainText(QString::fromUtf8((const char*)sqlite3_column_text(stmt,3),sqlite3_column_bytes(stmt,3)));
+		rs_cj->setText(QString::fromUtf8((const char*)sqlite3_column_text(stmt,4),sqlite3_column_bytes(stmt,4)));
+		rs_hsk->setText(QString::fromUtf8((const char*)sqlite3_column_text(stmt,5),sqlite3_column_bytes(stmt,5)));
+		rs_fq->setText(QString::fromUtf8((const char*)sqlite3_column_text(stmt,6),sqlite3_column_bytes(stmt,6)));
+	}
+	sqlite3_reset(stmt);
 
-	sql_result_free(res, true);
+	sqlite3_bind_text(pinyinStmt, 1, hanzi.toUtf8().constData(), -1, SQLITE_TRANSIENT);
+	QString pinyins;
+	while(sqlite3_step(pinyinStmt) == SQLITE_ROW) {
+		pinyins += QString::fromUtf8((const char*)sqlite3_column_text(pinyinStmt,0),sqlite3_column_bytes(pinyinStmt,0));
+		pinyins += ", ";
+	}
+	pinyins.chop(2);
+	rs_py->setText(pinyins);
+	sqlite3_reset(pinyinStmt);
 }
