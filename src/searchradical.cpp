@@ -53,7 +53,7 @@ SearchRadical::SearchRadical(QWidget *parent) : SearchPanel(parent) {
 	candidatesScrollArea->setWidgetResizable(true);
 	vtLayout->addWidget(candidatesScrollArea);
 
-	listRadicals  = new RowedList(font(), false, radicalScrollArea);
+	listRadicals  = new RowedList(font(), true, radicalScrollArea);
 	radicalScrollArea->setWidget(listRadicals);
 	radicalScrollArea->setWidgetResizable(true);
 	listCandidates = new RowedList(font(), false, candidatesScrollArea);

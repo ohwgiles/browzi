@@ -23,24 +23,31 @@
 #include "dbaccessor.hpp"
 #include "mainwindow.hpp"
 
-#ifdef _WIN32
-#define _UNICODE
-#include <windows.h>
-char* WIN_UNIHAN_DB_PATH() {
+#ifdef __linux__
+QString unihan_db_path() {
+	return "/usr/share/UnihanDb/Unihan.db";
+}
+#endif
 
+#ifdef _WIN32
+#define UNICODE
+#include <windows.h>
+QString unihan_db_path() {
+	wchar_t loc[MAX_PATH];
+	GetModuleFileName(NULL, loc, MAX_PATH);
+	QString result = QString::fromWCharArray(loc);
+	int len = result.length();
+	int slashPos = result.lastIndexOf('\\');
+	result.replace(slashPos,len-slashPos,"\\Unihan.db");
+	return result;
 }
 #endif
 
 int main(int argc, char** argv) {
-#ifdef _WIN32
-	uinhanDb_open(WIN_UNIHAN_DB_PATH(), O_READONLY);
-#else
-	DBAccessor::open("/usr/share/UnihanDb/Unihan.db");
-#endif
+	DBAccessor::open(unihan_db_path().toUtf8());
 	QApplication app(argc, argv);
 	MainWindow m;
 	m.show();
 	app.exec();
-
 	DBAccessor::close();
 }

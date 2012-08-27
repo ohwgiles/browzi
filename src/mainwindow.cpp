@@ -33,8 +33,12 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QIcon>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+	setWindowTitle("Browzi");
+	setWindowIcon(QIcon(":icon.svg"));
+
 	// Holds all the sub-widgets
 	QWidget* mainPanel = new QWidget(this);
 	// hzLayout has the tabs in the left, the character display in the right
