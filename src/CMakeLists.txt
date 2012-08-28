@@ -90,7 +90,7 @@ if(WIN32)
 endif()
 
 # Create the executable!
-add_executable(browzi ${SOURCES} ${MOCS} ${RCC} ${EXTRA_SOURCES})
+add_executable(browzi ${SOURCES} ${MOCS} ${RCC} ${EXTRA_SOURCES} version.h)
 target_link_libraries(browzi ${QT_LIBRARIES} ${SQLITE3_LIB})
 
 # ------------------- PACKAGING
@@ -106,9 +106,9 @@ set(CPACK_PACKAGE_EXECUTABLES "browzi;Browzi")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "1")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
-#set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-#file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h.txt" "#define VERSION \"${VERSION}\"")
-#add_custom_command(OUTPUT version.h COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/version.h.txt version.h)
+set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h.txt" "#define BROWZI_VERSION \"${VERSION}\"")
+add_custom_command(OUTPUT version.h COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/version.h.txt version.h)
 
 
 # Create the installer for Windows
@@ -127,4 +127,4 @@ if(WIN32)
  set(CPACK_STRIP_FILES "browzi.exe")
  set(CPACK_GENERATOR "NSIS")
 endif(WIN32)
-include(CPACK)
+include(CPack)
