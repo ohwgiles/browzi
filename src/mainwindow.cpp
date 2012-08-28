@@ -27,6 +27,7 @@
 #include "searchdraw.hpp"
 #include "searchpinyin.hpp"
 #include "searchenglish.hpp"
+#include "clipboard.hpp"
 #include "rowedlist.h"
 
 #include "characterdisplaypanel.hpp"
@@ -72,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	tabWidget->addTab(searchPinyin, "Pinyin");
 	SearchEnglish* searchEnglish = new SearchEnglish();
 	tabWidget->addTab(searchEnglish, "English");
+	Clipboard* clipboard = new Clipboard();
+	tabWidget->addTab(clipboard, "Clipboard");
 
 	hzLayout->addWidget(tabWidget);
 	hzLayout->setStretchFactor(tabWidget, 2);
@@ -96,12 +99,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(searchByDraw, SIGNAL(showCharacter(uint)), displayPanel, SLOT(setCharacter(uint)));
 	connect(searchPinyin, SIGNAL(showCharacter(uint)), displayPanel, SLOT(setCharacter(uint)));
 	connect(searchEnglish, SIGNAL(showCharacter(uint)), displayPanel, SLOT(setCharacter(uint)));
+	connect(clipboard, SIGNAL(showCharacter(uint)), displayPanel, SLOT(setCharacter(uint)));
 
 	connect(this, SIGNAL(updateChineseFont(QFont)), searchByDraw, SLOT(setChineseFont(QFont)));
 	connect(this, SIGNAL(updateChineseFont(QFont)), searchByRadical, SLOT(setChineseFont(QFont)));
 	connect(this, SIGNAL(updateChineseFont(QFont)),searchByStrokeCount, SLOT(setChineseFont(QFont)));
 	connect(this, SIGNAL(updateChineseFont(QFont)),searchPinyin, SLOT(setChineseFont(QFont)));
 	connect(this, SIGNAL(updateChineseFont(QFont)),searchEnglish, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)),clipboard, SLOT(setChineseFont(QFont)));
 
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 }

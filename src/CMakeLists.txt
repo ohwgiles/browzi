@@ -23,6 +23,7 @@ find_file(UNIHAN_DB NAMES Unihan.db PATHS ${CMAKE_BINARY_DIR})
 # Sources and headers
 set(SOURCES 
 	characterdisplaypanel.cpp
+	clipboard.cpp
    dbaccessor.cpp
    main.cpp
    mainwindow.cpp
@@ -41,6 +42,7 @@ set(SOURCES
 )
 set(HEADERS
 	characterdisplaypanel.hpp
+	clipboard.hpp
 	mainwindow.hpp
 	rowedlist.h
 	scribblearea.h
