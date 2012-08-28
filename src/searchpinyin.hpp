@@ -35,6 +35,7 @@ private:
 	sqlite3_stmt* stmt;
 private slots:
 	void searchTermChanged(QString s);
+	void setChineseFont(const QFont &);
 };
 
 #endif // SEARCHPINYIN_HPP

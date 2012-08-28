@@ -43,8 +43,14 @@ private:
 	QTabWidget* tabWidget;
 	CharacterDisplayPanel* displayPanel;
 
+signals:
+	void updateChineseFont(const QFont& f);
+
 private slots:
 	void tabChanged(int);
+	void showFontDialog();
+	void goToWebsite();
+	void showAboutBox();
 };
 
 #endif // MAINWINDOW_HPP

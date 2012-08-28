@@ -28,6 +28,7 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QScrollArea>
+#include <QPushButton>
 
 SearchDraw::SearchDraw() {
 	QVBoxLayout* vtLayout = new QVBoxLayout(this);
@@ -44,6 +45,18 @@ SearchDraw::SearchDraw() {
 	canvasDraw = new ScribbleArea(this);
 	canvasDraw->setFrameStyle(QFrame::Panel);
 	vtCanvasLayout->addWidget(canvasDraw);
+
+	QHBoxLayout* drawButtonsLayout = new QHBoxLayout();
+
+	QPushButton* undoButton = new QPushButton(tr("&Undo"), this);
+	connect(undoButton, SIGNAL(clicked()), canvasDraw, SLOT(undo()));
+	drawButtonsLayout->addWidget(undoButton);
+
+	QPushButton* clearButton = new QPushButton(tr("&Clear"), this);
+	connect(clearButton, SIGNAL(clicked()), canvasDraw, SLOT(clear()));
+	drawButtonsLayout->addWidget(clearButton);
+
+	vtCanvasLayout->addLayout(drawButtonsLayout);
 
 	hzCanvasLayout->addLayout(vtCanvasLayout);
 
@@ -94,4 +107,9 @@ void SearchDraw::searchHandwritten() {
 	items << matches;
 	candidates->clear();
 	candidates->setItems(items);
+}
+
+
+void SearchDraw::setChineseFont(const QFont & f) {
+	candidates->setFont(f);
 }

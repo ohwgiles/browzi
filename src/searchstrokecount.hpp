@@ -38,6 +38,7 @@ private:
 	sqlite3_stmt* stmt;
 private slots:
 	void strokesChanged(int);
+	void setChineseFont(const QFont &);
 	//void disambiguate(QString);
 };
 

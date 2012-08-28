@@ -40,6 +40,7 @@ private:
 
 private slots:
 	void radicalChosen(QString);
+	void setChineseFont(const QFont &);
 	//void disambiguated(QString);
 };
 

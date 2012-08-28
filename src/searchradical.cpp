@@ -126,3 +126,7 @@ void SearchRadical::disambiguated(QString s) {
 
 SearchRadical::~SearchRadical() {
 }
+void SearchRadical::setChineseFont(const QFont & f) {
+	listRadicals->setFont(f);
+	listCandidates->setFont(f);
+}

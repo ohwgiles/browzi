@@ -94,3 +94,6 @@ void SearchPinyin::searchTermChanged(QString s) {
 	} while(first++ != last);
 	candidates->setItems(cnd);
 }
+void SearchPinyin::setChineseFont(const QFont & f) {
+	candidates->setFont(f);
+}

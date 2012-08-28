@@ -21,6 +21,7 @@
  **************************************************************************/
 #include "mainwindow.hpp"
 
+#include "version.h"
 #include "searchradical.hpp"
 #include "searchstrokecount.hpp"
 #include "searchdraw.hpp"
@@ -34,10 +35,24 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QIcon>
+#include <QMenuBar>
+#include <QFontDialog>
+#include <QMessageBox>
+#include <QDesktopServices>
+#include <QUrl>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	setWindowTitle("Browzi");
 	setWindowIcon(QIcon(":icon.svg"));
+
+	QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
+	fileMenu->addAction(tr("E&xit"), this, SLOT(close()), QKeySequence(Qt::ALT | Qt::Key_F4));
+	QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
+	viewMenu->addAction(tr("&Font..."), this, SLOT(showFontDialog()));
+
+	QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
+	helpMenu->addAction(tr("Visit &Website"), this, SLOT(goToWebsite()));
+	helpMenu->addAction(tr("&About Browzi"), this, SLOT(showAboutBox()));
 
 	// Holds all the sub-widgets
 	QWidget* mainPanel = new QWidget(this);
@@ -57,7 +72,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	tabWidget->addTab(searchPinyin, "Pinyin");
 	SearchEnglish* searchEnglish = new SearchEnglish();
 	tabWidget->addTab(searchEnglish, "English");
+
 	hzLayout->addWidget(tabWidget);
+	hzLayout->setStretchFactor(tabWidget, 2);
 
 	// vtLayout contains the character panel, plus a spacer and about button
 	QVBoxLayout* vtLayout = new QVBoxLayout();
@@ -68,16 +85,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	QSpacerItem* verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 	vtLayout->addItem(verticalSpacer);
 
-	// The about button (flush right)
-	QHBoxLayout* aboutButtonLayout = new QHBoxLayout();
-	QSpacerItem* aboutButtonSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-	aboutButtonLayout->addItem(aboutButtonSpacer);
-	QPushButton* aboutButton = new QPushButton(mainPanel);
-	aboutButton->setText("About Browzi");
-	aboutButtonLayout->addWidget(aboutButton);
-	vtLayout->addLayout(aboutButtonLayout);
-
 	hzLayout->addLayout(vtLayout);
+	hzLayout->setStretchFactor(vtLayout, 1);
 
 	setCentralWidget(mainPanel);
 
@@ -88,12 +97,35 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(searchPinyin, SIGNAL(showCharacter(uint)), displayPanel, SLOT(setCharacter(uint)));
 	connect(searchEnglish, SIGNAL(showCharacter(uint)), displayPanel, SLOT(setCharacter(uint)));
 
+	connect(this, SIGNAL(updateChineseFont(QFont)), searchByDraw, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)), searchByRadical, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)),searchByStrokeCount, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)),searchPinyin, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)),searchEnglish, SLOT(setChineseFont(QFont)));
+
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 }
 
 void MainWindow::tabChanged(int i) {
 	SearchPanel* panel = static_cast<SearchPanel*>(tabWidget->widget(i));
 	displayPanel->setCharacter(panel->lastChar());
+}
+
+void MainWindow::showFontDialog() {
+	QFont f = QFontDialog::getFont(NULL, QFont("Microsoft YaHei"), this, tr("Select a font"));
+	emit updateChineseFont(f);
+}
+
+void MainWindow::goToWebsite() {
+	QDesktopServices::openUrl(QUrl("http://ohwgiles.github.com/browzi/"));
+}
+
+void MainWindow::showAboutBox() {
+	QMessageBox::about(this, tr("About Browzi"), tr(
+			"Browzi version " BROWZI_VERSION "\n\n"
+			"Chinese Hanzi Browser (Unihan database)\n\n"
+			"Copyright 2012 Oliver Giles\n"
+			"http://ohwgiles.github.com/browzi/"));
 }
 
 MainWindow::~MainWindow()

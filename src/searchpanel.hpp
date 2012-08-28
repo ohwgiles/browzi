@@ -37,6 +37,10 @@ private:
 
 signals:
 	void showCharacter(uint);
+
+public slots:
+	virtual void setChineseFont(const QFont &) = 0;
+
 protected slots:
 	void disambiguated(QString);
 };

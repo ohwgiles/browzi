@@ -82,3 +82,6 @@ void SearchStrokeCount::strokesChanged(int s) {
 void SearchStrokeCount::disambiguate(QString s) {
 	charChosen(s.toUcs4()[0]);
 }*/
+void SearchStrokeCount::setChineseFont(const QFont & f) {
+	candidates->setFont(f);
+}

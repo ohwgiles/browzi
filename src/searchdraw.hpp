@@ -36,6 +36,7 @@ private slots:
 private:
 	ScribbleArea* canvasDraw;
 	RowedList* candidates;
+	void setChineseFont(const QFont &);
 };
 
 #endif // SEARCHDRAW_HPP

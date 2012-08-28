@@ -35,6 +35,7 @@ public:
 private slots:
 	void searchTermModified(QString);
 	void entrySelected(QTreeWidgetItem*,QTreeWidgetItem*);
+	void setChineseFont(const QFont &);
 
 private:
 	QTreeWidget* candidates;
