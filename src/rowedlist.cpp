@@ -124,6 +124,7 @@ void RowedList::setFont(const QFont &newFont)
     QFontMetrics fm(curFont);
     curRowHeight=fm.height()+3;
     curCellWidth=curRowHeight;
+	 res(size().width());
     adjustSize();
     update();
     updateGeometry();
