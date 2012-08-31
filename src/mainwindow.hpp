@@ -42,6 +42,7 @@ public:
 private:
 	QTabWidget* tabWidget;
 	CharacterDisplayPanel* displayPanel;
+	QFont lastFont;
 
 signals:
 	void updateChineseFont(const QFont& f);

@@ -108,6 +108,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(this, SIGNAL(updateChineseFont(QFont)),searchEnglish, SLOT(setChineseFont(QFont)));
 	connect(this, SIGNAL(updateChineseFont(QFont)),clipboard, SLOT(setChineseFont(QFont)));
 
+#ifdef _WIN32
+	lastFont = QFont("unifont", 12);
+	emit updateChineseFont(lastFont);
+#endif
+
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 }
 
@@ -117,8 +122,12 @@ void MainWindow::tabChanged(int i) {
 }
 
 void MainWindow::showFontDialog() {
-	QFont f = QFontDialog::getFont(NULL, QFont("Microsoft YaHei"), this, tr("Select a font"));
-	emit updateChineseFont(f);
+	bool ok;
+	QFont f = QFontDialog::getFont(&ok, lastFont, this, tr("Select a font"));
+	if(ok) {
+		lastFont = f;
+		emit updateChineseFont(lastFont);
+	}
 }
 
 void MainWindow::goToWebsite() {

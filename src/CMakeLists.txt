@@ -2,6 +2,16 @@
 cmake_minimum_required(VERSION 2.6)
 project(browzi)
 
+# Version info
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "2")
+set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR})
+file(WRITE "${CMAKE_BINARY_DIR}/version.h.txt" "#define BROWZI_VERSION \"${VERSION}\"")
+add_custom_command(OUTPUT version.h
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	${CMAKE_BINARY_DIR}/version.h.txt ${CMAKE_BINARY_DIR}/version.h
+	DEPENDS ${CMAKE_BINARY_DIR}/version.h.txt)
+
 # Find Qt
 find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
@@ -92,7 +102,7 @@ if(WIN32)
 endif()
 
 # Create the executable!
-add_executable(browzi ${SOURCES} ${MOCS} ${RCC} ${EXTRA_SOURCES} version.h)
+add_executable(browzi ${SOURCES} ${MOCS} ${RCC} ${EXTRA_SOURCES} ${CMAKE_BINARY_DIR}/version.h)
 target_link_libraries(browzi ${QT_LIBRARIES} ${SQLITE3_LIB})
 
 # ------------------- PACKAGING
@@ -102,23 +112,22 @@ INCLUDE(InstallRequiredSystemLibraries)
 # Package description and copyright
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Browzi is a Hanzi browser")
 set(CPACK_PACKAGE_VENDOR "Oliver Giles")
-#set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION")
-#set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+#set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/DESCRIPTION")
+#set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_EXECUTABLES "browzi;Browzi")
-set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "1")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
-set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h.txt" "#define BROWZI_VERSION \"${VERSION}\"")
-add_custom_command(OUTPUT version.h COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_BINARY_DIR}/version.h.txt version.h)
-
 
 # Create the installer for Windows
 if(WIN32)
  install(TARGETS browzi RUNTIME DESTINATION .)
  string(REPLACE "bin/qmake.exe" "lib/QtCore4.dll" QT_CORE_DLL ${QT_QMAKE_EXECUTABLE})
  string(REPLACE "bin/qmake.exe" "lib/QtGui4.dll" QT_GUI_DLL ${QT_QMAKE_EXECUTABLE})
- install(FILES ${QT_CORE_DLL} ${QT_GUI_DLL} ${UNIHAN_DB} ${CMAKE_BINARY_DIR}/sqlite3.dll DESTINATION .)
+ install(FILES
+	 ${QT_CORE_DLL} ${QT_GUI_DLL}
+	 ${UNIHAN_DB}
+	 ${CMAKE_BINARY_DIR}/sqlite3.dll
+	 ${CMAKE_BINARY_DIR}/libgcc_s_dw2-1.dll
+	 ${CMAKE_BINARY_DIR}/mingwm10.dll
+	 DESTINATION .)
  # This gets rid of the console window
  set_target_properties(browzi PROPERTIES WIN32_EXECUTABLE true)
  set(CPACK_NSIS_INSTALLED_ICON_NAME "browzi.exe")
@@ -127,6 +136,7 @@ if(WIN32)
  set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/ohwgiles/browzi")
  set(CPACK_NSIS_CREATE_ICONS "CreateShortCut '\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Browzi.lnk' '\$INSTDIR\\\\browzi.exe'")
  set(CPACK_STRIP_FILES "browzi.exe")
+ set(CPACK_MODULE_PATH ${CMAKE_SOURCE_DIR})
  set(CPACK_GENERATOR "NSIS")
 endif(WIN32)
 include(CPack)
