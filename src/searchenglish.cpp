@@ -84,7 +84,8 @@ void SearchEnglish::searchTermModified(QString s) {
 }
 
 void SearchEnglish::entrySelected(QTreeWidgetItem* newItem,QTreeWidgetItem*) {
-	disambiguated( newItem->data(1, Qt::DisplayRole).toString());
+	if(newItem)
+		disambiguated( newItem->data(1, Qt::DisplayRole).toString());
 }
 void SearchEnglish::setChineseFont(const QFont & f) {
 	candidates->setFont(f);
