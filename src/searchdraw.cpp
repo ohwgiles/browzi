@@ -91,9 +91,8 @@ SearchDraw::SearchDraw() {
 
 void SearchDraw::searchHandwritten() {
 	CharacterDescriptor descr(canvasDraw->getCharacter().buildCharacterDescriptor());
-	StrokesMatcher matcher(descr,false);//noStrokeOrderCheckBox->isChecked());
-	//matcher.setNumMatches(preferences->maxNumMatches());
-	//matcher.setOnlyExact(preferences->onlyExact());
+	StrokesMatcher matcher(descr,true);
+	matcher.setNumMatches(50);
 
 	QList<QChar> v=matcher.doMatching();
 //	if (preferences->autoInsert() && v.count()==1) insertFromHanList(QString(v.at(0)));
