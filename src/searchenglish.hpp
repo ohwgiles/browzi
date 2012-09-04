@@ -23,14 +23,17 @@
  **************************************************************************/
 #include "searchpanel.hpp"
 #include "dbaccessor.hpp"
+#include "pinyin.hpp"
 
 class QTreeWidget;
 class QTreeWidgetItem;
+class QLineEdit;
 
-class SearchEnglish : public SearchPanel, public DBAccessor {
+class SearchEnglish : public SearchPanel, public DBAccessor, public PinyinConvertor {
 	Q_OBJECT
 public:
 	SearchEnglish();
+	void refresh();
 
 private slots:
 	void searchTermModified(QString);
@@ -40,6 +43,7 @@ private slots:
 private:
 	QTreeWidget* candidates;
 	sqlite3_stmt* stmt;
+	QLineEdit* english;
 };
 
 #endif // SEARCHENGLISH_HPP

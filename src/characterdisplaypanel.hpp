@@ -23,11 +23,12 @@
  **************************************************************************/
 #include <QWidget>
 #include "dbaccessor.hpp"
+#include "pinyin.hpp"
 
 class QLineEdit;
 class QPlainTextEdit;
 
-class CharacterDisplayPanel : public QWidget, public DBAccessor {
+class CharacterDisplayPanel : public QWidget, public DBAccessor, public PinyinConvertor {
 	Q_OBJECT
 public:
 	CharacterDisplayPanel();

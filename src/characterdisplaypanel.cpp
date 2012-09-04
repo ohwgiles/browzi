@@ -20,6 +20,7 @@
  *
  **************************************************************************/
 #include "characterdisplaypanel.hpp"
+#include "pinyin.hpp"
 #include <QGridLayout>
 #include <QLabel>
 #include <QPlainTextEdit>
@@ -175,7 +176,7 @@ void CharacterDisplayPanel::setCharacter(uint c) {
 	sqlite3_bind_text(pinyinStmt, 1, hanzi.toUtf8().constData(), -1, SQLITE_TRANSIENT);
 	QString pinyins;
 	while(sqlite3_step(pinyinStmt) == SQLITE_ROW) {
-		pinyins += QString::fromUtf8((const char*)sqlite3_column_text(pinyinStmt,0),sqlite3_column_bytes(pinyinStmt,0));
+		pinyins += convert(QString::fromUtf8((const char*)sqlite3_column_text(pinyinStmt,0),sqlite3_column_bytes(pinyinStmt,0)));
 		pinyins += ", ";
 	}
 	pinyins.chop(2);

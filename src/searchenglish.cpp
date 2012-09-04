@@ -34,8 +34,8 @@ SearchEnglish::SearchEnglish() {
 	englishWordLabel->setText("English word:");
 	vtLayout->addWidget(englishWordLabel);
 
-	QLineEdit* englishWord = new QLineEdit(this);
-	vtLayout->addWidget(englishWord);
+	english = new QLineEdit(this);
+	vtLayout->addWidget(english);
 
 	QLabel* disambiguateLabel = new QLabel(this);
 	disambiguateLabel->setText("Disambiguate:");
@@ -49,7 +49,7 @@ SearchEnglish::SearchEnglish() {
 	candidates->setRootIsDecorated(false);
 	vtLayout->addWidget(candidates);
 
-	connect(englishWord, SIGNAL(textEdited(QString)), this, SLOT(searchTermModified(QString)));
+	connect(english, SIGNAL(textEdited(QString)), this, SLOT(searchTermModified(QString)));
 	connect(candidates, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(entrySelected(QTreeWidgetItem*,QTreeWidgetItem*)));
 
 	stmt = createStatement(
@@ -63,6 +63,10 @@ SearchEnglish::SearchEnglish() {
 			order by kMandarinTable.kMandarin;");
 }
 
+void SearchEnglish::refresh() {
+	searchTermModified(english->text());
+}
+
 void SearchEnglish::searchTermModified(QString s) {
 	candidates->clear();
 	if(s.length() < 3) return;
@@ -72,7 +76,7 @@ void SearchEnglish::searchTermModified(QString s) {
 	QList<QTreeWidgetItem *> items;
 	while(sqlite3_step(stmt) == SQLITE_ROW) {
 		QStringList cols;
-		cols << QString::fromUtf8((const char*)sqlite3_column_text(stmt, 0))
+		cols << convert(QString::fromUtf8((const char*)sqlite3_column_text(stmt, 0)))
 			  << QString::fromUtf8((const char*)sqlite3_column_text(stmt, 1))
 			  << QString::fromUtf8((const char*)sqlite3_column_text(stmt, 2));
 		items.append(new QTreeWidgetItem((QTreeWidget*)0, cols));

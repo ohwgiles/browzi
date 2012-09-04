@@ -23,16 +23,20 @@
  **************************************************************************/
 #include "searchpanel.hpp"
 #include "dbaccessor.hpp"
+#include "pinyin.hpp"
 
 class RowedList;
+class QLineEdit;
 
-class SearchPinyin : public SearchPanel, public DBAccessor {
+class SearchPinyin : public SearchPanel, public DBAccessor, public PinyinConvertor {
 	Q_OBJECT
 public:
 	SearchPinyin();
+	void refresh();
 private:
 	RowedList* candidates;
 	sqlite3_stmt* stmt;
+	QLineEdit* pinyin;
 private slots:
 	void searchTermChanged(QString s);
 	void setChineseFont(const QFont &);

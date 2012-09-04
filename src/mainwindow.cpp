@@ -51,6 +51,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	fileMenu->addAction(tr("E&xit"), this, SLOT(close()), QKeySequence(Qt::ALT | Qt::Key_F4));
 	QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
 	viewMenu->addAction(tr("&Font..."), this, SLOT(showFontDialog()));
+	QActionGroup* pinyinGroup = new QActionGroup(this);
+	pa = new QAction("Accented Pinyin",this);
+	pa->setCheckable(true);
+	pinyinGroup->addAction(pa);
+	pn = new QAction("Numbered Pinyin",this);
+	pn->setCheckable(true);
+	pinyinGroup->addAction(pn);
+	connect(pinyinGroup, SIGNAL(triggered(QAction*)), this, SLOT(pinyinDisplayChanged(QAction*)));
+	viewMenu->addSeparator();
+	viewMenu->addAction(pa);
+	viewMenu->addAction(pn);
 
 	QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
 	helpMenu->addAction(tr("Visit &Website"), this, SLOT(goToWebsite()));
@@ -117,6 +128,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 	lastFont = QFont(s.value("font","unifont").toString(), 12);
 	emit updateChineseFont(lastFont);
+
+	PinyinConvertor::Mode m = PinyinConvertor::Mode(s.value("pinyin", 0).toInt());
+	if(m == PinyinConvertor::PINYIN_ACCENTED) {
+		pa->setChecked(true);
+		PinyinConvertor::setAccented();
+	}
+	if(m == PinyinConvertor::PINYIN_NUMBERED) {
+		pn->setChecked(true);
+		PinyinConvertor::setNumbered();
+	}
 }
 
 void MainWindow::tabChanged(int i) {
@@ -133,6 +154,14 @@ void MainWindow::showFontDialog() {
 	}
 }
 
+void MainWindow::pinyinDisplayChanged(QAction * a) {
+	if(a == pa) PinyinConvertor::setAccented();
+	if(a == pn) PinyinConvertor::setNumbered();
+	SearchPanel* panel = static_cast<SearchPanel*>(tabWidget->currentWidget());
+	panel->refresh();
+	displayPanel->setCharacter(panel->lastChar());
+}
+
 void MainWindow::goToWebsite() {
 	QDesktopServices::openUrl(QUrl("http://ohwgiles.github.com/browzi/"));
 }
@@ -143,6 +172,7 @@ void MainWindow::closeEvent(QCloseEvent *) {
 	s.setValue("font",lastFont.toString());
 	s.setValue("size",size());
 	s.setValue("pos",pos());
+	s.setValue("pinyin", PinyinConvertor::getMode());
 }
 
 void MainWindow::showAboutBox() {

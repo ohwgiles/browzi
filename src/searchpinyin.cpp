@@ -36,7 +36,7 @@ SearchPinyin::SearchPinyin()
 	pinyinLabel->setText("Pinyin:");
 	vtLayout->addWidget(pinyinLabel);
 
-	QLineEdit* pinyin = new QLineEdit(this);
+	pinyin = new QLineEdit(this);
 	vtLayout->addWidget(pinyin);
 
 	QLabel* disambiguateLabel = new QLabel(this);
@@ -69,6 +69,10 @@ SearchPinyin::SearchPinyin()
 
 }
 
+void SearchPinyin::refresh() {
+	searchTermChanged(pinyin->text());
+}
+
 void SearchPinyin::searchTermChanged(QString s) {
 	candidates->clear();
 	if(s.isEmpty()) return;
@@ -85,7 +89,7 @@ void SearchPinyin::searchTermChanged(QString s) {
 	do {
 		QString pinyin = s.toUpper().toUtf8() + first;
 		sqlite3_bind_text(stmt, 1, pinyin.toUtf8().constData(), -1, SQLITE_TRANSIENT);
-		QString hanzi = s + first + "|";
+		QString hanzi = convert(s + first) + "|";
 		while(sqlite3_step(stmt) == SQLITE_ROW) {
 			hanzi.append(QString::fromUtf8((const char*)sqlite3_column_text(stmt,0)));
 		}

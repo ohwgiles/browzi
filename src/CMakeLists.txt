@@ -4,7 +4,7 @@ project(browzi)
 
 # Version info
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "2")
+set(CPACK_PACKAGE_VERSION_MINOR "3")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR})
 file(WRITE "${CMAKE_BINARY_DIR}/version.h.txt" "#define BROWZI_VERSION \"${VERSION}\"")
 add_custom_command(OUTPUT version.h
@@ -37,6 +37,7 @@ set(SOURCES
    dbaccessor.cpp
    main.cpp
    mainwindow.cpp
+	pinyin.cpp
    rowedlist.cpp
    scribblearea.cpp
    searchdraw.cpp

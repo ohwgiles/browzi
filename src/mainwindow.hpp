@@ -44,6 +44,8 @@ private:
 	QTabWidget* tabWidget;
 	CharacterDisplayPanel* displayPanel;
 	QFont lastFont;
+	QAction* pa;
+	QAction* pn;
 
 signals:
 	void updateChineseFont(const QFont& f);
@@ -53,6 +55,7 @@ private slots:
 	void showFontDialog();
 	void goToWebsite();
 	void showAboutBox();
+	void pinyinDisplayChanged(QAction*);
 };
 
 #endif // MAINWINDOW_HPP

@@ -1,8 +1,8 @@
-#ifndef SEARCHPANEL_HPP
-#define SEARCHPANEL_HPP
+#ifndef PINYIN_HPP
+#define PINYIN_HPP
 /**************************************************************************
  *
- *  searchpanel.hpp
+ *  pinyin.hpp
  *  Copyright 2012 Oliver Giles
  *
  *  This file is part of Browzi.
@@ -22,27 +22,23 @@
  *
  **************************************************************************/
 
-#include <QWidget>
-class CharacterDisplayPanel;
+#include <QString>
 
-class SearchPanel : public QWidget {
-	Q_OBJECT
+class PinyinConvertor {
 public:
-	SearchPanel(QWidget *parent = 0);
-
-	virtual void refresh() {}
-	uint lastChar() const { return lastCharacter; }
+	enum Mode { PINYIN_ACCENTED=0, PINYIN_NUMBERED };
+	static void setAccented() { mode = PINYIN_ACCENTED; }
+	static void setNumbered() { mode = PINYIN_NUMBERED; }
+protected:
+	QString convert(QString s);
 private:
-	uint lastCharacter;
-
-signals:
-	void showCharacter(uint);
-
-public slots:
-	virtual void setChineseFont(const QFont &) = 0;
-
-protected slots:
-	void disambiguated(QString);
+	QString numberedToAccented(QString p);
+	QString accentedToNumbered(QString p);
+	static Mode mode;
+	static const QString ACCENTS;
+public:
+	static Mode getMode() { return mode; }
 };
 
-#endif // SEARCHPANEL_HPP
+
+#endif // PINYIN_HPP
