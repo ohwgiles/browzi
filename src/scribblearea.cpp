@@ -96,7 +96,7 @@ void ScribbleArea::mouseReleaseEvent(QMouseEvent *e)
 
 }
 
-void ScribbleArea::paintEvent(QPaintEvent * /* event */)
+void ScribbleArea::paintEvent(QPaintEvent * e)
 {
     QPainter painter(this);
     painter.setPen(Qt::white);
@@ -127,5 +127,6 @@ void ScribbleArea::paintEvent(QPaintEvent * /* event */)
     		previousPoint = nextPoint;
     	}
 	}
+	QFrame::paintEvent(e);
 }
 

@@ -43,7 +43,7 @@ SearchDraw::SearchDraw() {
 	vtCanvasLayout->addWidget(canvasDrawLabel);
 
 	canvasDraw = new ScribbleArea(this);
-	canvasDraw->setFrameStyle(QFrame::Panel);
+	canvasDraw->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
 	vtCanvasLayout->addWidget(canvasDraw);
 
 	QHBoxLayout* drawButtonsLayout = new QHBoxLayout();
