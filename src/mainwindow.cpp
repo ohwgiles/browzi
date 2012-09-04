@@ -41,6 +41,7 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	setWindowTitle("Browzi");
@@ -109,12 +110,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	connect(this, SIGNAL(updateChineseFont(QFont)), clipboard, SLOT(setChineseFont(QFont)));
 	connect(this, SIGNAL(updateChineseFont(QFont)), displayPanel, SLOT(setChineseFont(QFont)));
 
-#ifdef _WIN32
-	lastFont = QFont("unifont", 12);
-	emit updateChineseFont(lastFont);
-#endif
-
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+
+	QSettings s("Browzi", "Browzi");
+	setGeometry(QRect(s.value("pos", QPoint(200,100)).toPoint(), s.value("size",QSize(600,400)).toSize()));
+
+	lastFont = QFont(s.value("font","unifont").toString(), 12);
+	emit updateChineseFont(lastFont);
 }
 
 void MainWindow::tabChanged(int i) {
@@ -133,6 +135,14 @@ void MainWindow::showFontDialog() {
 
 void MainWindow::goToWebsite() {
 	QDesktopServices::openUrl(QUrl("http://ohwgiles.github.com/browzi/"));
+}
+
+void MainWindow::closeEvent(QCloseEvent *) {
+	// save the font and window geometry for next time
+	QSettings s("Browzi","Browzi");
+	s.setValue("font",lastFont.toString());
+	s.setValue("size",size());
+	s.setValue("pos",pos());
 }
 
 void MainWindow::showAboutBox() {
