@@ -36,10 +36,6 @@ CharacterDisplayPanel::CharacterDisplayPanel() {
 	// Field: Hanzi
 	rs_hz = new QLineEdit(this);
 	rs_hz->setReadOnly(true);
-	// --- increase the font size
-	QFont f = rs_hz->font();
-	f.setPixelSize(38);
-	rs_hz->setFont(f);
 	grid->addWidget(rs_hz, 0, 1, 1, 1);
 	// Label: Radical
 	QLabel* lbl_rad = new QLabel(this);
@@ -137,6 +133,12 @@ CharacterDisplayPanel::CharacterDisplayPanel() {
 			from kMandarinTable\
 			join utf8Table on kMandarinTable.code = utf8Table.code\
 			where utf8Table.utf8 == ?;");
+}
+
+void CharacterDisplayPanel::setChineseFont(QFont f) {
+	rs_rad->setFont(f);
+	f.setPixelSize(38);
+	rs_hz->setFont(f);
 }
 
 void CharacterDisplayPanel::clear() {

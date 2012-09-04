@@ -33,6 +33,7 @@ public:
 	CharacterDisplayPanel();
 
 public slots:
+	void setChineseFont(QFont f);
 	void setCharacter(uint);
 	void clear();
 

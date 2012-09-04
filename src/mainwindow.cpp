@@ -103,10 +103,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
 	connect(this, SIGNAL(updateChineseFont(QFont)), searchByDraw, SLOT(setChineseFont(QFont)));
 	connect(this, SIGNAL(updateChineseFont(QFont)), searchByRadical, SLOT(setChineseFont(QFont)));
-	connect(this, SIGNAL(updateChineseFont(QFont)),searchByStrokeCount, SLOT(setChineseFont(QFont)));
-	connect(this, SIGNAL(updateChineseFont(QFont)),searchPinyin, SLOT(setChineseFont(QFont)));
-	connect(this, SIGNAL(updateChineseFont(QFont)),searchEnglish, SLOT(setChineseFont(QFont)));
-	connect(this, SIGNAL(updateChineseFont(QFont)),clipboard, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)), searchByStrokeCount, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)), searchPinyin, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)), searchEnglish, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)), clipboard, SLOT(setChineseFont(QFont)));
+	connect(this, SIGNAL(updateChineseFont(QFont)), displayPanel, SLOT(setChineseFont(QFont)));
 
 #ifdef _WIN32
 	lastFont = QFont("unifont", 12);
