@@ -43,9 +43,21 @@ QString unihan_db_path() {
 }
 #endif
 
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+QString unihan_db_path() {
+	char loc[2048];
+	unsigned size = sizeof(loc);
+	_NSGetExecutablePath(loc, &size);
+	*strrchr(loc, '/') = 0;
+	return QString::fromLocal8Bit(loc) + "/../Resources/Unihan.db";
+}
+#endif
+
 int main(int argc, char** argv) {
 	DBAccessor::open(unihan_db_path().toUtf8());
 	QApplication app(argc, argv);
+	app.setWindowIcon(QIcon(":icon.svg"));
 	MainWindow m;
 	m.show();
 	app.exec();

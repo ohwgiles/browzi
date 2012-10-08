@@ -30,7 +30,7 @@ class RowedList;
 class SearchDraw : public SearchPanel, public DBAccessor {
 	Q_OBJECT
 public:
-	SearchDraw();
+	SearchDraw(QWidget* parent = 0);
 private slots:
 	void searchHandwritten();
 private:

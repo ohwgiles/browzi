@@ -72,13 +72,14 @@ qt4_add_resources(RCC resources.qrc)
 include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 
 # Debug
-add_definitions(-O0 -g)
+set(CMAKE_CXX_FLAGS_Debug "-O0 -g")
 # Release
-# add_definitions(-O3)
+set(CMAKE_CXX_FLAGS_Release "-O3")
 
-# If we have ImageMagick, create the icon from the svg.
-# Otherwise you can drop icon.ico into the build directory.
+# If we have ImageMagick, create icons from the svg.
+# Otherwise you can drop icon.ico/icns into the build directory.
 find_package(ImageMagick QUIET)
+find_program(PNG2ICNS png2icns QUIET)
 if(ImageMagick_FOUND)
  foreach(ICON_SIZE 16x16 32x32 48x48 64x64 128x128 256x256)
   add_custom_command(OUTPUT icon_${ICON_SIZE}.png
@@ -91,6 +92,11 @@ if(ImageMagick_FOUND)
  add_custom_command(OUTPUT icon.ico
 	 COMMAND convert ${ICON_FILES} icon.ico DEPENDS ${ICON_FILES})
  add_custom_target(icon DEPENDS icon.ico)
+ if(PNG2ICNS)
+  add_custom_command(OUTPUT icon.icns
+     COMMAND ${PNG2ICNS} icon.icns ${ICON_FILES})
+  add_custom_target(icns DEPENDS icon.icns)
+ endif(PNG2ICNS)
 endif()
 
 # On Windows, embeded the icon as a resources
@@ -104,7 +110,7 @@ endif()
 
 # Create the executable!
 add_executable(browzi ${SOURCES} ${MOCS} ${RCC} ${EXTRA_SOURCES} ${CMAKE_BINARY_DIR}/version.h)
-target_link_libraries(browzi ${QT_LIBRARIES} ${SQLITE3_LIB})
+target_link_libraries(browzi ${QT_LIBRARIES} ${QT_QTSVG_LIBRARY} ${SQLITE3_LIB})
 
 # ------------------- PACKAGING
 
@@ -140,4 +146,16 @@ if(WIN32)
  set(CPACK_MODULE_PATH ${CMAKE_SOURCE_DIR})
  set(CPACK_GENERATOR "NSIS")
 endif(WIN32)
+
+if(APPLE)
+ set_target_properties(browzi PROPERTIES OUTPUT_NAME "Browzi")
+ install(FILES ${UNIHAN_DB} DESTINATION Resources)
+
+ set(CPACK_PACKAGE_FILE_NAME "Browzi v${VERSION}")
+ set(CPACK_BUNDLE_NAME "Browzi")
+ set(CPACK_BUNDLE_ICON "icon.icns")
+ set(CPACK_BUNDLE_PLIST "${CMAKE_SOURCE_DIR}/Info.plist")
+ set(CPACK_GENERATOR "Bundle")
+endif(APPLE)
+
 include(CPack)

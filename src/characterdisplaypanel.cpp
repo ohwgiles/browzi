@@ -138,7 +138,7 @@ CharacterDisplayPanel::CharacterDisplayPanel() {
 
 void CharacterDisplayPanel::setChineseFont(QFont f) {
 	rs_rad->setFont(f);
-	f.setPixelSize(38);
+	f.setPointSize(38);
 	rs_hz->setFont(f);
 }
 

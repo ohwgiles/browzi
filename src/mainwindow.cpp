@@ -45,7 +45,6 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	setWindowTitle("Browzi");
-	setWindowIcon(QIcon(":icon.svg"));
 
 	QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(tr("E&xit"), this, SLOT(close()), QKeySequence(Qt::ALT | Qt::Key_F4));
@@ -79,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	tabWidget->addTab(searchByRadical, QString("Radical"));
 	SearchStrokeCount* searchByStrokeCount = new SearchStrokeCount();
 	tabWidget->addTab(searchByStrokeCount, QString("Stroke Count"));
-	SearchDraw* searchByDraw = new SearchDraw();
+	SearchDraw* searchByDraw = new SearchDraw(tabWidget);
 	tabWidget->addTab(searchByDraw, "Draw");
 	SearchPinyin* searchPinyin = new SearchPinyin();
 	tabWidget->addTab(searchPinyin, "Pinyin");

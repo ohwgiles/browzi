@@ -30,7 +30,7 @@
 #include <QScrollArea>
 #include <QPushButton>
 
-SearchDraw::SearchDraw() {
+SearchDraw::SearchDraw(QWidget* parent) : SearchPanel(parent) {
 	QVBoxLayout* vtLayout = new QVBoxLayout(this);
 	QHBoxLayout* hzCanvasLayout = new QHBoxLayout();
 
