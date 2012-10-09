@@ -4,7 +4,7 @@ project(browzi)
 
 # Version info
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "3")
+set(CPACK_PACKAGE_VERSION_MINOR "4")
 set(VERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR})
 file(WRITE "${CMAKE_BINARY_DIR}/version.h.txt" "#define BROWZI_VERSION \"${VERSION}\"")
 add_custom_command(OUTPUT version.h
@@ -81,9 +81,9 @@ set(CMAKE_CXX_FLAGS_Release "-O3")
 find_package(ImageMagick QUIET)
 find_program(PNG2ICNS png2icns QUIET)
 if(ImageMagick_FOUND)
- foreach(ICON_SIZE 16x16 32x32 48x48 64x64 128x128 256x256)
+ foreach(ICON_SIZE 16x16 32x32 48x48 128x128 256x256)
   add_custom_command(OUTPUT icon_${ICON_SIZE}.png
-	 COMMAND ${ImageMagick_CONVERT_EXECUTABLE}
+	 COMMAND ${ImageMagick_convert_EXECUTABLE}
 	 ARGS -flatten -channel RGBA -colorspace RGB -geometry ${ICON_SIZE}
 			-background none -quality 80 -depth 8
 			${CMAKE_SOURCE_DIR}/icon.svg icon_${ICON_SIZE}.png DEPENDS icon.svg)
@@ -91,10 +91,10 @@ if(ImageMagick_FOUND)
  endforeach()
  add_custom_command(OUTPUT icon.ico
 	 COMMAND convert ${ICON_FILES} icon.ico DEPENDS ${ICON_FILES})
- add_custom_target(icon DEPENDS icon.ico)
+ add_custom_target(ico DEPENDS icon.ico)
  if(PNG2ICNS)
   add_custom_command(OUTPUT icon.icns
-     COMMAND ${PNG2ICNS} icon.icns ${ICON_FILES})
+	  COMMAND ${PNG2ICNS} icon.icns ${ICON_FILES} DEPENDS ${ICON_FILES})
   add_custom_target(icns DEPENDS icon.icns)
  endif(PNG2ICNS)
 endif()
