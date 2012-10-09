@@ -110,7 +110,7 @@ endif()
 
 # Create the executable!
 add_executable(browzi ${SOURCES} ${MOCS} ${RCC} ${EXTRA_SOURCES} ${CMAKE_BINARY_DIR}/version.h)
-target_link_libraries(browzi ${QT_LIBRARIES} ${QT_QTSVG_LIBRARY} ${SQLITE3_LIB})
+target_link_libraries(browzi ${QT_LIBRARIES} ${SQLITE3_LIB})
 
 # ------------------- PACKAGING
 
@@ -147,9 +147,18 @@ if(WIN32)
  set(CPACK_GENERATOR "NSIS")
 endif(WIN32)
 
+
+
 if(APPLE)
+ configure_file(osx_fixlibs.sh.in osx_fixlibs.sh @ONLY)
+
+ add_custom_command(TARGET browzi POST_BUILD COMMAND ./osx_fixlibs.sh $<TARGET_FILE:browzi>)
+ install(FILES ${CMAKE_BINARY_DIR}/QtCore ${CMAKE_BINARY_DIR}/QtGui DESTINATION ../MacOS)
+ install(DIRECTORY ${QT_QTGUI_LIBRARY}/Versions/Current/Resources/qt_menu.nib DESTINATION .)
+ install(TARGETS browzi DESTINATION ../MacOS)
+ 
  set_target_properties(browzi PROPERTIES OUTPUT_NAME "Browzi")
- install(FILES ${UNIHAN_DB} DESTINATION Resources)
+ install(FILES ${UNIHAN_DB} DESTINATION .)
 
  set(CPACK_PACKAGE_FILE_NAME "Browzi v${VERSION}")
  set(CPACK_BUNDLE_NAME "Browzi")

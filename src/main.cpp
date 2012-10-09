@@ -57,7 +57,9 @@ QString unihan_db_path() {
 int main(int argc, char** argv) {
 	DBAccessor::open(unihan_db_path().toUtf8());
 	QApplication app(argc, argv);
+#ifndef __APPLE__ // I think this looks odd on the mac. Plist handles the dock icon
 	app.setWindowIcon(QIcon(":icon.svg"));
+#endif
 	MainWindow m;
 	m.show();
 	app.exec();

@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e -x
+
+app=$1
+
+dylib() {
+ fwname=${1##*/}
+ echo $1/$(readlink $1/${fwname%.framework})
+}
+
+qtcore=$(dylib @QT_QTCORE_LIBRARY@)
+qtgui=$(dylib @QT_QTGUI_LIBRARY@)
+
+# copy the required dylibs to our build dir
+rsync -a $qtcore $qtgui ./
+
+# dylib path convenience variable
+dlp="@executable_path"
+
+fix_id() {
+ libname=$1
+ install_name_tool -id $dlp/$libname $libname
+}
+
+fix_lib() {
+ original=$1
+ name=$2
+ inbin=$3
+ install_name_tool -change $original $dlp/$name $inbin
+}
+
+# fix the frameworks to @executable_path
+fix_id QtCore
+fix_id QtGui
+# dependencies
+fix_lib $qtcore QtCore QtGui
+
+# do the same for the app itself
+update_app() {
+ original=$1
+ name=$2
+ install_name_tool -change $original $dlp/$name $app
+}
+update_app $qtcore QtCore
+update_app $qtgui QtGui
